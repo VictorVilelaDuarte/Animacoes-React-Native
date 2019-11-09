@@ -16,23 +16,30 @@ const styles = StyleSheet.create({
   },
 });
 
+const ballY = new Animated.Value(0);
+const ballX = Animated.divide(ballY, 2);
+
 export default class App extends Component {
   state = {
-    ballY: new Animated.Value(0),
+    ballY,
+    ballX,
   };
 
   componentDidMount() {
-    const { ballY } = this.state;
-    Animated.decay(ballY, {
-      velocity: 1.5,
+    Animated.decay(this.state.ballY, {
+      velocity: 1.4,
     }).start();
   }
 
   render() {
-    const { ballY } = this.state;
     return (
       <View style={styles.container}>
-        <Animated.View style={[styles.ball, { top: ballY }]} />
+        <Animated.View
+          style={[
+            styles.ball,
+            { top: this.state.ballY, left: this.state.ballX },
+          ]}
+        />
       </View>
     );
   }
