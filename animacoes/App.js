@@ -1,5 +1,6 @@
+/* eslint-disable no-underscore-dangle */
 import React, { Component } from 'react';
-import { StyleSheet, View, Animated } from 'react-native';
+import { StyleSheet, View, Animated, PanResponder } from 'react-native';
 
 // Animated-> Animated.View, Animated.Text, Animated.Image, Animated.ScrollView
 
@@ -18,32 +19,44 @@ const styles = StyleSheet.create({
 
 export default class App extends Component {
   state = {
-    ballY: new Animated.Value(0),
+    ball: new Animated.ValueXY({ x: 0, y: 0 }),
   };
 
-  componentDidMount() {
-    const { ballY } = this.state;
-    Animated.timing(ballY, {
-      toValue: 700,
-      duration: 1000,
-    }).start();
+  componentWillMount() {
+    const { ball } = this.state;
+
+    this.panResponder = PanResponder.create({
+      onPanResponderGrant: (e, gestureState) => {
+        ball.setOffset({
+          x: ball.x._value,
+          y: ball.y._value,
+        });
+        ball.setValue({ x: 0, y: 0 });
+      },
+      onMoveShouldSetPanResponder: (e, gestureState) => true,
+      onPanResponderMove: Animated.event([
+        null,
+        {
+          dx: ball.x,
+          dy: ball.y,
+        },
+      ]),
+
+      onPanResponderRelease: () => {
+        ball.flattenOffset();
+      },
+    });
   }
 
   render() {
-    const { ballY } = this.state;
+    const { ball } = this.state;
     return (
       <View style={styles.container}>
         <Animated.View
+          {...this.panResponder.panHandlers}
           style={[
             styles.ball,
-            {
-              top: ballY,
-              opacity: ballY.interpolate({
-                inputRange: [0, 300],
-                outputRange: [1, 0.2],
-                extrapolate: 'clamp',
-              }),
-            },
+            { transform: [{ translateX: ball.x }, { translateY: ball.y }] },
           ]}
         />
       </View>
