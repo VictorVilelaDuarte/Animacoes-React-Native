@@ -19,52 +19,33 @@ const styles = StyleSheet.create({
 export default class App extends Component {
   state = {
     ballY: new Animated.Value(0),
-    ballX: new Animated.Value(0),
   };
 
   componentDidMount() {
-    const { ballX, ballY } = this.state;
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(ballY, {
-          duration: 500,
-          toValue: 200,
-        }),
-
-        Animated.delay(200),
-
-        Animated.timing(ballX, {
-          duration: 500,
-          toValue: 200,
-        }),
-
-        Animated.delay(200),
-
-        Animated.timing(ballY, {
-          duration: 500,
-          toValue: 0,
-        }),
-
-        Animated.delay(200),
-
-        Animated.timing(ballX, {
-          duration: 500,
-          toValue: 0,
-        }),
-
-        Animated.delay(200),
-      ]),
-      {
-        iterations: 2,
-      }
-    ).start();
+    const { ballY } = this.state;
+    Animated.timing(ballY, {
+      toValue: 700,
+      duration: 1000,
+    }).start();
   }
 
   render() {
-    const { ballX, ballY } = this.state;
+    const { ballY } = this.state;
     return (
       <View style={styles.container}>
-        <Animated.View style={[styles.ball, { top: ballY, left: ballX }]} />
+        <Animated.View
+          style={[
+            styles.ball,
+            {
+              top: ballY,
+              opacity: ballY.interpolate({
+                inputRange: [0, 300],
+                outputRange: [1, 0.2],
+                extrapolate: 'clamp',
+              }),
+            },
+          ]}
+        />
       </View>
     );
   }
